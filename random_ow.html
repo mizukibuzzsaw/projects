@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OW Practice Picker</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <style>
+        :root { --ow-orange: #f99e1a; --ow-blue: #405275; --dark-bg: #22262e; }
+        body { font-family: sans-serif; text-align: center; background: var(--dark-bg); color: white; padding: 20px; display: flex; flex-direction: column; min-height: 100vh; align-items: center; }
+        
+        .role-container { display: flex; gap: 10px; margin-bottom: 20px; }
+        .role-btn { padding: 10px 15px; border: 2px solid #444; background: none; color: #888; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .role-btn.active { border-color: var(--ow-orange); color: var(--ow-orange); }
+
+        #hero-display { font-size: 2.8rem; margin: 30px 0; color: var(--ow-orange); font-weight: 900; text-transform: uppercase; min-height: 1.2em; }
+        
+        #roll-btn { padding: 20px 50px; font-size: 1.4rem; background: var(--ow-orange); color: white; border: none; border-radius: 50px; font-weight: bold; box-shadow: 0 5px #c87a0b; }
+        #roll-btn:disabled { background: #555; box-shadow: none; }
+
+        .history-list { list-style: none; padding: 0; margin-top: 40px; color: #666; font-size: 0.9rem; }
+        #status { font-size: 0.7em; color: #666; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <h2>PRACTICE PICKER</h2>
+    <div id="status">Syncing...</div>
+
+    <div class="role-container">
+        <button class="role-btn active" type="button" onclick="setRole('all', this)">ALL</button>
+        <button class="role-btn" type="button" onclick="setRole('tank', this)">TANK</button>
+        <button class="role-btn" type="button" onclick="setRole('damage', this)">DPS</button>
+        <button class="role-btn" type="button" onclick="setRole('support', this)">SUPP</button>
+    </div>
+
+    <div id="hero-display">READY</div>
+    <button id="roll-btn" type="button" onclick="pickHero()" disabled>ROLL HERO</button>
+
+    <ul class="history-list" id="history-list"></ul>
+
+    <script>
+        const BATTLE_TAG = "BottleCaps#11122"; // Edit this
+        let currentRole = 'all';
+        let heroData = [];
+
+        // FEB 2026 Hero Role Mapping
+        const heroRoles = {
+            tank: ["dva", "doomfist", "junker-queen", "mauga", "orisa", "ramattra", "reinhardt", "roadhog", "sigma", "winston", "wrecking-ball", "zarya", "hazard", "domina"],
+            damage: ["ashe", "bastion", "cassidy", "echo", "genji", "hanzo", "junkrat", "mei", "pharah", "reaper", "sojourn", "soldier-76", "sombra", "symmetra", "torbjorn", "tracer", "widowmaker", "venture", "vendetta", "freja", "anran", "emre"],
+            support: ["ana", "baptiste", "brigitte", "illari", "juno", "kiriko", "lifeweaver", "lucio", "mercy", "moira", "zenyatta", "wuyang", "mizuki", "jetpack-cat"]
+        };
+
+        async function loadStats() {
+            try {
+                const url = `https://overfast-api.tekrop.fr/players/${encodeURIComponent(BATTLE_TAG)}/stats/summary`;
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+
+                // Safely read nested data
+                heroData = Array.isArray(data?.heroes_comparisons?.time_played?.values)
+                    ? data.heroes_comparisons.time_played.values
+                    : [];
+
+                if (heroData.length === 0) {
+                    document.getElementById('status').innerText = "No public hero playtime data found (check profile privacy)";
+                    document.getElementById('roll-btn').disabled = true;
+                } else {
+                    document.getElementById('status').innerText = `Logged in: ${BATTLE_TAG}`;
+                    document.getElementById('roll-btn').disabled = false;
+                }
+            } catch (e) {
+                document.getElementById('status').innerText = "Error: Check Profile Privacy or BattleTag";
+                document.getElementById('roll-btn').disabled = true;
+            }
+        }
+
+        function setRole(role, btn) {
+            currentRole = role;
+            document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        function pickHero() {
+            // Guard when no data loaded
+            if (!Array.isArray(heroData) || heroData.length === 0) {
+                document.getElementById('status').innerText = 'No hero data available';
+                return;
+            }
+
+            // Filter data by selected role
+            let filtered = (currentRole === 'all')
+                ? heroData.slice()
+                : heroData.filter(h => heroRoles[currentRole]?.includes(h.hero));
+
+            // Remove entries without numeric value
+            filtered = filtered.filter(h => typeof h.value === 'number' && !isNaN(h.value));
+
+            if (filtered.length === 0) {
+                document.getElementById('status').innerText = `No heroes for role: ${currentRole.toUpperCase()}`;
+                return;
+            }
+
+            const maxSec = Math.max(...filtered.map(h => h.value));
+            const buffer = (maxSec > 0) ? maxSec * 0.1 : 1;
+
+            // Inverse Weights
+            const weighted = filtered.map(h => ({
+                name: (h.hero || '').replace(/-/g, ' '),
+                weight: Math.max((maxSec - h.value) + buffer, 0.0001)
+            }));
+
+            const totalWeight = weighted.reduce((s, h) => s + h.weight, 0);
+            let random = Math.random() * totalWeight;
+
+            for (let h of weighted) {
+                if (random < h.weight) {
+                    const display = document.getElementById('hero-display');
+                    display.innerText = h.name || 'Unknown';
+                    updateHistory(h.name || 'Unknown');
+                    return;
+                }
+                random -= h.weight;
+            }
+
+            // Fallback
+            const fallback = weighted[Math.floor(Math.random() * weighted.length)];
+            document.getElementById('hero-display').innerText = fallback.name;
+            updateHistory(fallback.name);
+        }
+
+        function updateHistory(name) {
+            const li = document.createElement('li');
+            li.innerText = name;
+            const list = document.getElementById('history-list');
+            list.prepend(li);
+            if (list.children.length > 5) list.lastChild.remove();
+        }
+
+        loadStats();
+    </script>
+</body>
+</html>
