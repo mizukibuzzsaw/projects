@@ -4,103 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Miki's OW Picker</title>
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="icon" href="data:,">
+    
     <style>
         :root { 
             --ow-orange: #f99e1a; 
-            --ow-blue: #405275; 
             --dark-bg: #1a1c21; 
-            --card-bg: #2a2d35;
         }
-        
         body { 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            font-family: sans-serif; 
             text-align: center; 
             background: var(--dark-bg); 
             color: white; 
             padding: 20px; 
-            margin: 0;
             display: flex; 
             flex-direction: column; 
             align-items: center; 
             min-height: 100vh;
         }
-
-        h2 { letter-spacing: 2px; font-weight: 900; font-style: italic; margin-top: 40px; }
-
-        #status { 
-            font-size: 0.8rem; 
-            background: rgba(0,0,0,0.3); 
-            padding: 5px 15px; 
-            border-radius: 20px; 
-            margin-bottom: 30px;
-            color: #aaa;
-        }
-
         .role-container { display: flex; gap: 8px; margin-bottom: 30px; }
-        
-        .role-btn { 
-            padding: 12px 18px; 
-            border: 2px solid #444; 
-            background: none; 
-            color: white; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            font-weight: bold;
-            transition: 0.2s;
-            font-size: 0.8rem;
-        }
-        
-        .role-btn.active { 
-            border-color: var(--ow-orange); 
-            background: var(--ow-orange);
-            box-shadow: 0 0 15px rgba(249, 158, 26, 0.4);
-        }
-
-        #hero-display { 
-            font-size: 3.2rem; 
-            margin: 40px 0; 
-            color: white; 
-            font-weight: 900; 
-            text-transform: uppercase; 
-            font-style: italic;
-            text-shadow: 3px 3px 0px var(--ow-orange);
-            min-height: 1.2em;
-        }
-        
-        #roll-btn { 
-            padding: 18px 60px; 
-            font-size: 1.5rem; 
-            background: #fff; 
-            color: #000; 
-            border: none; 
-            border-radius: 4px; 
-            font-weight: 900; 
-            cursor: pointer;
-            text-transform: uppercase;
-            transition: transform 0.1s;
-        }
-
-        #roll-btn:active { transform: scale(0.95); }
-        #roll-btn:disabled { background: #444; color: #888; cursor: not-allowed; }
-
-        .history-container {
-            margin-top: auto;
-            padding-top: 40px;
-            width: 100%;
-            max-width: 300px;
-        }
-
-        .history-list { 
-            list-style: none; 
-            padding: 0; 
-            color: #777; 
-            font-size: 1rem;
-            border-top: 1px solid #333;
-        }
-
-        .history-list li { padding: 8px 0; border-bottom: 1px solid #222; text-transform: capitalize; }
-        .history-list li:first-child { color: #ccc; font-weight: bold; }
+        .role-btn { padding: 12px; border: 2px solid #444; background: none; color: white; border-radius: 6px; cursor: pointer; }
+        .role-btn.active { border-color: var(--ow-orange); background: var(--ow-orange); }
+        #hero-display { font-size: 3rem; margin: 40px 0; font-weight: 900; font-style: italic; text-shadow: 2px 2px var(--ow-orange); }
+        #roll-btn { padding: 15px 40px; font-size: 1.2rem; background: white; color: black; border: none; font-weight: 900; cursor: pointer; }
+        #roll-btn:disabled { background: #444; color: #888; }
+        #status { font-size: 0.8rem; color: #777; margin-bottom: 20px; }
+        .history-list { list-style: none; padding: 0; color: #555; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -109,55 +40,49 @@
     <div id="status">INITIALIZING...</div>
 
     <div class="role-container">
-        <button type="button" class="role-btn active" onclick="setRole('all', this)">ALL</button>
-        <button type="button" class="role-btn" onclick="setRole('tank', this)">TANK</button>
-        <button type="button" class="role-btn" onclick="setRole('damage', this)">DPS</button>
-        <button type="button" class="role-btn" onclick="setRole('support', this)">SUPP</button>
+        <button class="role-btn active" onclick="setRole('all', this)">ALL</button>
+        <button class="role-btn" onclick="setRole('tank', this)">TANK</button>
+        <button class="role-btn" onclick="setRole('damage', this)">DPS</button>
+        <button class="role-btn" onclick="setRole('support', this)">SUPP</button>
     </div>
 
     <div id="hero-display">READY</div>
-    <button type="button" id="roll-btn" onclick="pickHero()" disabled>ROLL HERO</button>
+    <button id="roll-btn" onclick="pickHero()" disabled>ROLL HERO</button>
 
-    <div class="history-container">
-        <ul class="history-list" id="history-list"></ul>
-    </div>
+    <ul class="history-list" id="history-list"></ul>
 
     <script>
         const BATTLE_TAG = "BottleCaps-11122"; 
         let currentRole = 'all';
         let heroData = [];
 
-        // Updated 2026 Hero List
         const heroRoles = {
             tank: ["dva", "doomfist", "junker-queen", "mauga", "orisa", "ramattra", "reinhardt", "roadhog", "sigma", "winston", "wrecking-ball", "zarya", "hazard", "domina"],
             damage: ["ashe", "bastion", "cassidy", "echo", "genji", "hanzo", "junkrat", "mei", "pharah", "reaper", "sojourn", "soldier-76", "sombra", "symmetra", "torbjorn", "tracer", "widowmaker", "venture", "vendetta", "freja", "anran", "emre"],
             support: ["ana", "baptiste", "brigitte", "illari", "juno", "kiriko", "lifeweaver", "lucio", "mercy", "moira", "zenyatta", "wuyang", "mizuki"]
         };
 
-        // All heroes in one flat array for the "shuffle" animation
-        const allHeroNames = Object.values(heroRoles).flat();
-
         async function loadStats() {
             const statusEl = document.getElementById('status');
             try {
-                // Using corsproxy.io to bypass GitHub Pages CORS restrictions
+                // Switched to a different proxy (AllOrigins) which is often more stable
                 const apiUrl = `https://overfast-api.tekrop.fr/players/${encodeURIComponent(BATTLE_TAG)}/stats/summary`;
-                const proxiedUrl = `https://corsproxy.io/?${encodeURIComponent(apiUrl)}`;
+                const proxiedUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`;
                 
                 const response = await fetch(proxiedUrl);
-                if (!response.ok) throw new Error('Could not fetch data');
+                if (!response.ok) throw new Error('API Error');
                 
                 const data = await response.json();
                 heroData = data?.heroes_comparisons?.time_played?.values || [];
 
                 if (heroData.length === 0) {
-                    statusEl.innerText = "NO DATA: IS PROFILE PUBLIC?";
+                    statusEl.innerText = "CHECK PROFILE PRIVACY (MUST BE PUBLIC)";
                 } else {
-                    statusEl.innerText = `READY: ${BATTLE_TAG.replace('-', '#')}`;
+                    statusEl.innerText = `READY: ${BATTLE_TAG}`;
                     document.getElementById('roll-btn').disabled = false;
                 }
             } catch (e) {
-                statusEl.innerText = "CONNECTION ERROR: TRY AGAIN";
+                statusEl.innerText = "ERROR 429: WAIT 5 MINUTES AND REFRESH";
                 console.error(e);
             }
         }
@@ -170,24 +95,13 @@
 
         function pickHero() {
             if (heroData.length === 0) return;
-
-            // 1. Filter heroes by the chosen role
-            let filtered = (currentRole === 'all')
-                ? [...heroData]
-                : heroData.filter(h => heroRoles[currentRole]?.includes(h.hero));
-
-            if (filtered.length === 0) {
-                document.getElementById('hero-display').innerText = "NO DATA";
-                return;
-            }
-
-            // 2. Inverse Weighting Logic (Less playtime = Higher chance)
+            let filtered = (currentRole === 'all') ? [...heroData] : heroData.filter(h => heroRoles[currentRole]?.includes(h.hero));
+            
             const maxSec = Math.max(...filtered.map(h => h.value));
-            const buffer = maxSec * 0.1 || 60; // 10% buffer or 60s for unplayed heroes
+            const buffer = maxSec * 0.1 || 60;
 
             const weighted = filtered.map(h => ({
-                id: h.hero,
-                displayName: h.hero.replace(/-/g, ' '),
+                name: h.hero.replace(/-/g, ' ').toUpperCase(),
                 weight: (maxSec - h.value) + buffer
             }));
 
@@ -196,33 +110,12 @@
 
             for (let h of weighted) {
                 if (random < h.weight) {
-                    runSelectionAnimation(h.displayName);
+                    document.getElementById('hero-display').innerText = h.name;
+                    updateHistory(h.name);
                     return;
                 }
                 random -= h.weight;
             }
-        }
-
-        function runSelectionAnimation(finalName) {
-            const display = document.getElementById('hero-display');
-            const btn = document.getElementById('roll-btn');
-            btn.disabled = true;
-            
-            let ticks = 0;
-            const maxTicks = 12;
-            
-            const interval = setInterval(() => {
-                const randomName = allHeroNames[Math.floor(Math.random() * allHeroNames.length)];
-                display.innerText = randomName.replace(/-/g, ' ');
-                ticks++;
-                
-                if (ticks >= maxTicks) {
-                    clearInterval(interval);
-                    display.innerText = finalName;
-                    updateHistory(finalName);
-                    btn.disabled = false;
-                }
-            }, 60);
         }
 
         function updateHistory(name) {
@@ -233,7 +126,6 @@
             if (list.children.length > 5) list.lastChild.remove();
         }
 
-        // Initialize
         loadStats();
     </script>
 </body>
