@@ -65,13 +65,10 @@
         async function loadStats() {
             const statusEl = document.getElementById('status');
             try {
-                // Switched to a different proxy (AllOrigins) which is often more stable
-                const apiUrl = `https://overfast-api.tekrop.fr/players/${encodeURIComponent(BATTLE_TAG)}/stats/summary`;
-                const proxiedUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`;
-                
-                const response = await fetch(proxiedUrl);
+                // Use your backend as a proxy to avoid CORS issues
+                const apiUrl = `/api/owstats/${BATTLE_TAG}`;
+                const response = await fetch(apiUrl);
                 if (!response.ok) throw new Error('API Error');
-                
                 const data = await response.json();
                 heroData = Object.entries(data?.heroes_comparisons?.time_played || {}).map(([hero, value]) => ({ hero, value }));
 
