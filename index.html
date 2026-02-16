@@ -7,7 +7,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="icon" href="data:,">
-    
+
     <style>
         :root { 
             --ow-orange: #f99e1a; 
@@ -40,14 +40,14 @@
     <div id="status">INITIALIZING...</div>
 
     <div class="role-container">
-        <button class="role-btn active" onclick="setRole('all', this)">ALL</button>
-        <button class="role-btn" onclick="setRole('tank', this)">TANK</button>
-        <button class="role-btn" onclick="setRole('damage', this)">DPS</button>
-        <button class="role-btn" onclick="setRole('support', this)">SUPP</button>
+        <button type="button" class="role-btn active" onclick="setRole('all', this)">ALL</button>
+        <button type="button" class="role-btn" onclick="setRole('tank', this)">TANK</button>
+        <button type="button" class="role-btn" onclick="setRole('damage', this)">DPS</button>
+        <button type="button" class="role-btn" onclick="setRole('support', this)">SUPP</button>
     </div>
 
     <div id="hero-display">READY</div>
-    <button id="roll-btn" onclick="pickHero()" disabled>ROLL HERO</button>
+    <button type="button" id="roll-btn" onclick="pickHero()" disabled>ROLL HERO</button>
 
     <ul class="history-list" id="history-list"></ul>
 
@@ -73,7 +73,7 @@
                 if (!response.ok) throw new Error('API Error');
                 
                 const data = await response.json();
-                heroData = data?.heroes_comparisons?.time_played?.values || [];
+                heroData = Object.entries(data?.heroes_comparisons?.time_played || {}).map(([hero, value]) => ({ hero, value }));
 
                 if (heroData.length === 0) {
                     statusEl.innerText = "CHECK PROFILE PRIVACY (MUST BE PUBLIC)";
