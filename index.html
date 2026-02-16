@@ -3,76 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OW Practice Picker</title>
+    <title>Miki's OW Picker</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <style>
-        :root { --ow-orange: #f99e1a; --ow-blue: #405275; --dark-bg: #22262e; }
-        body { font-family: sans-serif; text-align: center; background: var(--dark-bg); color: white; padding: 20px; display: flex; flex-direction: column; min-height: 100vh; align-items: center; }
+        :root { 
+            --ow-orange: #f99e1a; 
+            --ow-blue: #405275; 
+            --dark-bg: #1a1c21; 
+            --card-bg: #2a2d35;
+        }
         
-        .role-container { display: flex; gap: 10px; margin-bottom: 20px; }
-        .role-btn { padding: 10px 15px; border: 2px solid #444; background: none; color: #888; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .role-btn.active { border-color: var(--ow-orange); color: var(--ow-orange); }
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            text-align: center; 
+            background: var(--dark-bg); 
+            color: white; 
+            padding: 20px; 
+            margin: 0;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh;
+        }
 
-        #hero-display { font-size: 2.8rem; margin: 30px 0; color: var(--ow-orange); font-weight: 900; text-transform: uppercase; min-height: 1.2em; }
+        h2 { letter-spacing: 2px; font-weight: 900; font-style: italic; margin-top: 40px; }
+
+        #status { 
+            font-size: 0.8rem; 
+            background: rgba(0,0,0,0.3); 
+            padding: 5px 15px; 
+            border-radius: 20px; 
+            margin-bottom: 30px;
+            color: #aaa;
+        }
+
+        .role-container { display: flex; gap: 8px; margin-bottom: 30px; }
         
-        #roll-btn { padding: 20px 50px; font-size: 1.4rem; background: var(--ow-orange); color: white; border: none; border-radius: 50px; font-weight: bold; box-shadow: 0 5px #c87a0b; }
-        #roll-btn:disabled { background: #555; box-shadow: none; }
+        .role-btn { 
+            padding: 12px 18px; 
+            border: 2px solid #444; 
+            background: none; 
+            color: white; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-weight: bold;
+            transition: 0.2s;
+            font-size: 0.8rem;
+        }
+        
+        .role-btn.active { 
+            border-color: var(--ow-orange); 
+            background: var(--ow-orange);
+            box-shadow: 0 0 15px rgba(249, 158, 26, 0.4);
+        }
 
-        .history-list { list-style: none; padding: 0; margin-top: 40px; color: #666; font-size: 0.9rem; }
-        #status { font-size: 0.7em; color: #666; margin-bottom: 10px; }
+        #hero-display { 
+            font-size: 3.2rem; 
+            margin: 40px 0; 
+            color: white; 
+            font-weight: 900; 
+            text-transform: uppercase; 
+            font-style: italic;
+            text-shadow: 3px 3px 0px var(--ow-orange);
+            min-height: 1.2em;
+        }
+        
+        #roll-btn { 
+            padding: 18px 60px; 
+            font-size: 1.5rem; 
+            background: #fff; 
+            color: #000; 
+            border: none; 
+            border-radius: 4px; 
+            font-weight: 900; 
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: transform 0.1s;
+        }
+
+        #roll-btn:active { transform: scale(0.95); }
+        #roll-btn:disabled { background: #444; color: #888; cursor: not-allowed; }
+
+        .history-container {
+            margin-top: auto;
+            padding-top: 40px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .history-list { 
+            list-style: none; 
+            padding: 0; 
+            color: #777; 
+            font-size: 1rem;
+            border-top: 1px solid #333;
+        }
+
+        .history-list li { padding: 8px 0; border-bottom: 1px solid #222; text-transform: capitalize; }
+        .history-list li:first-child { color: #ccc; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <h2>MIKI'S RANDOM CHARACTER SELECTOR</h2>
-    <div id="status">Syncing...</div>
+    <h2>PRACTICE PICKER</h2>
+    <div id="status">INITIALIZING...</div>
 
     <div class="role-container">
-        <button class="role-btn active" type="button" onclick="setRole('all', this)">ALL</button>
-        <button class="role-btn" type="button" onclick="setRole('tank', this)">TANK</button>
-        <button class="role-btn" type="button" onclick="setRole('damage', this)">DPS</button>
-        <button class="role-btn" type="button" onclick="setRole('support', this)">SUPP</button>
+        <button type="button" class="role-btn active" onclick="setRole('all', this)">ALL</button>
+        <button type="button" class="role-btn" onclick="setRole('tank', this)">TANK</button>
+        <button type="button" class="role-btn" onclick="setRole('damage', this)">DPS</button>
+        <button type="button" class="role-btn" onclick="setRole('support', this)">SUPP</button>
     </div>
 
     <div id="hero-display">READY</div>
-    <button id="roll-btn" type="button" onclick="pickHero()" disabled>ROLL HERO</button>
+    <button type="button" id="roll-btn" onclick="pickHero()" disabled>ROLL HERO</button>
 
-    <ul class="history-list" id="history-list"></ul>
+    <div class="history-container">
+        <ul class="history-list" id="history-list"></ul>
+    </div>
 
     <script>
-        const BATTLE_TAG = "BottleCaps-11122"; // Edit this
+        const BATTLE_TAG = "BottleCaps-11122"; 
         let currentRole = 'all';
         let heroData = [];
 
-        // FEB 2026 Hero Role Mapping
+        // Updated 2026 Hero List
         const heroRoles = {
             tank: ["dva", "doomfist", "junker-queen", "mauga", "orisa", "ramattra", "reinhardt", "roadhog", "sigma", "winston", "wrecking-ball", "zarya", "hazard", "domina"],
             damage: ["ashe", "bastion", "cassidy", "echo", "genji", "hanzo", "junkrat", "mei", "pharah", "reaper", "sojourn", "soldier-76", "sombra", "symmetra", "torbjorn", "tracer", "widowmaker", "venture", "vendetta", "freja", "anran", "emre"],
-            support: ["ana", "baptiste", "brigitte", "illari", "juno", "kiriko", "lifeweaver", "lucio", "mercy", "moira", "zenyatta", "wuyang", "mizuki", "jetpack-cat"]
+            support: ["ana", "baptiste", "brigitte", "illari", "juno", "kiriko", "lifeweaver", "lucio", "mercy", "moira", "zenyatta", "wuyang", "mizuki"]
         };
 
-        async function loadStats() {
-            try {
-                const url = `https://overfast-api.tekrop.fr/players/${encodeURIComponent(BATTLE_TAG)}/stats/summary`;
-                const response = await fetch(url);
-                if (!response.ok) throw new Error('Network response was not ok');
-                const data = await response.json();
+        // All heroes in one flat array for the "shuffle" animation
+        const allHeroNames = Object.values(heroRoles).flat();
 
-                // Safely read nested data
-                heroData = Array.isArray(data?.heroes_comparisons?.time_played?.values)
-                    ? data.heroes_comparisons.time_played.values
-                    : [];
+        async function loadStats() {
+            const statusEl = document.getElementById('status');
+            try {
+                // Using corsproxy.io to bypass GitHub Pages CORS restrictions
+                const apiUrl = `https://overfast-api.tekrop.fr/players/${encodeURIComponent(BATTLE_TAG)}/stats/summary`;
+                const proxiedUrl = `https://corsproxy.io/?${encodeURIComponent(apiUrl)}`;
+                
+                const response = await fetch(proxiedUrl);
+                if (!response.ok) throw new Error('Could not fetch data');
+                
+                const data = await response.json();
+                heroData = data?.heroes_comparisons?.time_played?.values || [];
 
                 if (heroData.length === 0) {
-                    document.getElementById('status').innerText = "No public hero playtime data found (check profile privacy)";
-                    document.getElementById('roll-btn').disabled = true;
+                    statusEl.innerText = "NO DATA: IS PROFILE PUBLIC?";
                 } else {
-                    document.getElementById('status').innerText = `Logged in: ${BATTLE_TAG}`;
+                    statusEl.innerText = `READY: ${BATTLE_TAG.replace('-', '#')}`;
                     document.getElementById('roll-btn').disabled = false;
                 }
             } catch (e) {
-                document.getElementById('status').innerText = "Error: Check Profile Privacy or BattleTag";
-                document.getElementById('roll-btn').disabled = true;
+                statusEl.innerText = "CONNECTION ERROR: TRY AGAIN";
+                console.error(e);
             }
         }
 
@@ -83,32 +169,26 @@
         }
 
         function pickHero() {
-            // Guard when no data loaded
-            if (!Array.isArray(heroData) || heroData.length === 0) {
-                document.getElementById('status').innerText = 'No hero data available';
-                return;
-            }
+            if (heroData.length === 0) return;
 
-            // Filter data by selected role
+            // 1. Filter heroes by the chosen role
             let filtered = (currentRole === 'all')
-                ? heroData.slice()
+                ? [...heroData]
                 : heroData.filter(h => heroRoles[currentRole]?.includes(h.hero));
 
-            // Remove entries without numeric value
-            filtered = filtered.filter(h => typeof h.value === 'number' && !isNaN(h.value));
-
             if (filtered.length === 0) {
-                document.getElementById('status').innerText = `No heroes for role: ${currentRole.toUpperCase()}`;
+                document.getElementById('hero-display').innerText = "NO DATA";
                 return;
             }
 
+            // 2. Inverse Weighting Logic (Less playtime = Higher chance)
             const maxSec = Math.max(...filtered.map(h => h.value));
-            const buffer = (maxSec > 0) ? maxSec * 0.1 : 1;
+            const buffer = maxSec * 0.1 || 60; // 10% buffer or 60s for unplayed heroes
 
-            // Inverse Weights
             const weighted = filtered.map(h => ({
-                name: (h.hero || '').replace(/-/g, ' '),
-                weight: Math.max((maxSec - h.value) + buffer, 0.0001)
+                id: h.hero,
+                displayName: h.hero.replace(/-/g, ' '),
+                weight: (maxSec - h.value) + buffer
             }));
 
             const totalWeight = weighted.reduce((s, h) => s + h.weight, 0);
@@ -116,18 +196,33 @@
 
             for (let h of weighted) {
                 if (random < h.weight) {
-                    const display = document.getElementById('hero-display');
-                    display.innerText = h.name || 'Unknown';
-                    updateHistory(h.name || 'Unknown');
+                    runSelectionAnimation(h.displayName);
                     return;
                 }
                 random -= h.weight;
             }
+        }
 
-            // Fallback
-            const fallback = weighted[Math.floor(Math.random() * weighted.length)];
-            document.getElementById('hero-display').innerText = fallback.name;
-            updateHistory(fallback.name);
+        function runSelectionAnimation(finalName) {
+            const display = document.getElementById('hero-display');
+            const btn = document.getElementById('roll-btn');
+            btn.disabled = true;
+            
+            let ticks = 0;
+            const maxTicks = 12;
+            
+            const interval = setInterval(() => {
+                const randomName = allHeroNames[Math.floor(Math.random() * allHeroNames.length)];
+                display.innerText = randomName.replace(/-/g, ' ');
+                ticks++;
+                
+                if (ticks >= maxTicks) {
+                    clearInterval(interval);
+                    display.innerText = finalName;
+                    updateHistory(finalName);
+                    btn.disabled = false;
+                }
+            }, 60);
         }
 
         function updateHistory(name) {
@@ -138,6 +233,7 @@
             if (list.children.length > 5) list.lastChild.remove();
         }
 
+        // Initialize
         loadStats();
     </script>
 </body>
