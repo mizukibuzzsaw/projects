@@ -43,43 +43,88 @@
 
 <script>
     const heroes = [
-        // 2026 NEW HEROES
-        { name: "Domina", role: "tank", id: "domina" },
-        { name: "Anran", role: "damage", id: "anran" },
-        { name: "Emre", role: "damage", id: "emre" },
-        { name: "Jetpack Cat", role: "support", id: "jetpack-cat" },
-        { name: "Mizuki", role: "support", id: "mizuki" },
+        // --- TANKS ---
+        { name: "D.Va", role: "tank", id: "dva" },
+        { name: "Doomfist", role: "tank", id: "doomfist" },
         { name: "Hazard", role: "tank", id: "hazard" },
-        // CLASSIC ROSTER (Shortened for speed)
-        { name: "D.Va", role: "tank", id: "dva" }, { name: "Reinhardt", role: "tank", id: "reinhardt" },
-        { name: "Genji", role: "damage", id: "genji" }, { name: "Tracer", role: "damage", id: "tracer" },
-        { name: "Kiriko", role: "support", id: "kiriko" }, { name: "Mercy", role: "support", id: "mercy" },
-        { name: "Ana", role: "support", id: "ana" }, { name: "Juno", role: "support", id: "juno" }
+        { name: "Domina", role: "tank", id: "domina" }, // 2026 Release
+        { name: "Junker Queen", role: "tank", id: "junker-queen" },
+        { name: "Mauga", role: "tank", id: "mauga" },
+        { name: "Orisa", role: "tank", id: "orisa" },
+        { name: "Ramattra", role: "tank", id: "ramattra" },
+        { name: "Reinhardt", role: "tank", id: "reinhardt" },
+        { name: "Roadhog", role: "tank", id: "roadhog" },
+        { name: "Sigma", role: "tank", id: "sigma" },
+        { name: "Winston", role: "tank", id: "winston" },
+        { name: "Wrecking Ball", role: "tank", id: "wrecking-ball" },
+        { name: "Zarya", role: "tank", id: "zarya" },
+
+        // --- DAMAGE ---
+        { name: "Anran", role: "damage", id: "anran" }, // 2025/26 Release
+        { name: "Ashe", role: "damage", id: "ashe" },
+        { name: "Bastion", role: "damage", id: "bastion" },
+        { name: "Cassidy", role: "damage", id: "cassidy" },
+        { name: "Echo", role: "damage", id: "echo" },
+        { name: "Emre", role: "damage", id: "emre" }, // 2026 Release
+        { name: "Genji", role: "damage", id: "genji" },
+        { name: "Hanzo", role: "damage", id: "hanzo" },
+        { name: "Junkrat", role: "damage", id: "junkrat" },
+        { name: "Mei", role: "damage", id: "mei" },
+        { name: "Pharah", role: "damage", id: "pharah" },
+        { name: "Reaper", role: "damage", id: "reaper" },
+        { name: "Sojourn", role: "damage", id: "sojourn" },
+        { name: "Soldier: 76", role: "damage", id: "soldier-76" },
+        { name: "Sombra", role: "damage", id: "sombra" },
+        { name: "Symmetra", role: "damage", id: "symmetra" },
+        { name: "Torbjörn", role: "damage", id: "torbjorn" },
+        { name: "Tracer", role: "damage", id: "tracer" },
+        { name: "Venture", role: "damage", id: "venture" },
+        { name: "Widowmaker", role: "damage", id: "widowmaker" },
+
+        // --- SUPPORT ---
+        { name: "Ana", role: "support", id: "ana" },
+        { name: "Baptiste", role: "support", id: "baptiste" },
+        { name: "Brigitte", role: "support", id: "brigitte" },
+        { name: "Illari", role: "support", id: "illari" },
+        { name: "Jetpack Cat", role: "support", id: "jetpack-cat" }, // 2026 Release
+        { name: "Juno", role: "support", id: "juno" },
+        { name: "Kiriko", role: "support", id: "kiriko" },
+        { name: "Lifeweaver", role: "support", id: "lifeweaver" },
+        { name: "Lúcio", role: "support", id: "lucio" },
+        { name: "Mercy", role: "support", id: "mercy" },
+        { name: "Mizuki", role: "support", id: "mizuki" }, // 2025 Release
+        { name: "Moira", role: "support", id: "moira" },
+        { name: "Zenyatta", role: "support", id: "zenyatta" }
     ];
 
     let currentRole = 'all';
 
     function setRole(role, btn) {
         currentRole = role;
+        // Update button UI
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
 
     function roll() {
+        // Filter based on selected role
         const pool = currentRole === 'all' ? heroes : heroes.filter(h => h.role === currentRole);
         const choice = pool[Math.floor(Math.random() * pool.length)];
 
         const img = document.getElementById('hero-img');
         const placeholder = document.getElementById('placeholder');
         
+        // Update Text Info
         document.getElementById('hero-name').innerText = choice.name;
         document.getElementById('hero-role').innerText = choice.role.toUpperCase();
 
+        // Loading State
         img.style.display = 'none';
         placeholder.style.display = 'block';
         placeholder.innerText = "...";
 
-        // Use the official Blizzard CDN with the no-referrer fix
+        // Image Path Logic
+        // Note: We use icon-portrait.png for the best card-style fit
         img.src = `https://d15f34w2p8l1cc.cloudfront.net/overwatch/static/hero/${choice.id}/icon-portrait.png`;
 
         img.onload = () => {
@@ -91,6 +136,7 @@
             img.style.display = 'none';
             placeholder.style.display = 'block';
             placeholder.innerText = choice.name[0];
+            console.warn("Portrait missing for " + choice.name);
         };
     }
 </script>
