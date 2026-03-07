@@ -13,7 +13,7 @@
         }
 
         body {
-            font-family: 'BigNoodleTitling', sans-serif, Arial;
+            font-family: 'Segoe UI', sans-serif, Arial;
             background: var(--bg-dark);
             color: white;
             text-align: center;
@@ -26,7 +26,6 @@
 
         h1 { color: var(--ow-orange); font-style: italic; letter-spacing: 1px; margin-bottom: 10px; }
 
-        /* Role Filter Styling */
         .filter-container {
             display: flex;
             gap: 8px;
@@ -44,17 +43,14 @@
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-            transition: 0.3s;
             font-size: 0.9rem;
         }
 
         .filter-btn.active {
             background: var(--ow-blue);
             color: white;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
         }
 
-        /* Hero Card */
         .card {
             background: var(--card-bg);
             width: 90%;
@@ -77,24 +73,26 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
         }
 
-        .portrait-container img {
-            width: 110%; /* Slight zoom for better fit */
-            height: auto;
-            display: none; /* Hidden until loaded */
+        #hero-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
         }
 
         .placeholder {
             font-size: 3rem;
             color: #444;
+            font-weight: bold;
         }
 
         #hero-name {
             font-size: 2.4rem;
             margin: 10px 0;
             text-transform: uppercase;
-            letter-spacing: -1px;
         }
 
         .role-badge {
@@ -107,7 +105,6 @@
             letter-spacing: 1px;
         }
 
-        /* Main Button */
         .random-btn {
             background: var(--ow-orange);
             border: none;
@@ -143,26 +140,22 @@
     <div class="card">
         <div class="portrait-container">
             <div id="placeholder" class="placeholder">?</div>
-            <img id="hero-img" src="https://via.placeholder.com/150?text=?" alt="Hero Portrait">
+            <img id="hero-img" alt="Hero Portrait" src="about:blank">
         </div>
-        <div class="role-badge" id="hero-role">SELECT ROLE</div>
-        <div id="hero-name">READY?</div>
+        <div class="role-badge" id="hero-role">READY?</div>
+        <div id="hero-name">ROLL START</div>
     </div>
 
     <button type="button" class="random-btn" onclick="pickHero()">ROLL HERO</button>
 
 <script>
     const heroes = [
-        // TANKS
         { name: "D.Va", role: "Tank", id: "dva" }, { name: "Doomfist", role: "Tank", id: "doomfist" },
         { name: "Junker Queen", role: "Tank", id: "junker-queen" }, { name: "Mauga", role: "Tank", id: "mauga" },
         { name: "Orisa", role: "Tank", id: "orisa" }, { name: "Ramattra", role: "Tank", id: "ramattra" },
         { name: "Reinhardt", role: "Tank", id: "reinhardt" }, { name: "Roadhog", role: "Tank", id: "roadhog" },
         { name: "Sigma", role: "Tank", id: "sigma" }, { name: "Winston", role: "Tank", id: "winston" },
         { name: "Wrecking Ball", role: "Tank", id: "wrecking-ball" }, { name: "Zarya", role: "Tank", id: "zarya" },
-        { name: "Hazard", role: "Tank", id: "hazard" }, { name: "Domina", role: "Tank", id: "domina" },
-
-        // DAMAGE
         { name: "Ashe", role: "Damage", id: "ashe" }, { name: "Bastion", role: "Damage", id: "bastion" },
         { name: "Cassidy", role: "Damage", id: "cassidy" }, { name: "Echo", role: "Damage", id: "echo" },
         { name: "Genji", role: "Damage", id: "genji" }, { name: "Hanzo", role: "Damage", id: "hanzo" },
@@ -172,16 +165,12 @@
         { name: "Sombra", role: "Damage", id: "sombra" }, { name: "Symmetra", role: "Damage", id: "symmetra" },
         { name: "Torbjörn", role: "Damage", id: "torbjorn" }, { name: "Tracer", role: "Damage", id: "tracer" },
         { name: "Venture", role: "Damage", id: "venture" }, { name: "Widowmaker", role: "Damage", id: "widowmaker" },
-        { name: "Anran", role: "Damage", id: "anran" }, { name: "Vendetta", role: "Damage", id: "vendetta" },
-
-        // SUPPORT
         { name: "Ana", role: "Support", id: "ana" }, { name: "Baptiste", role: "Support", id: "baptiste" },
         { name: "Brigitte", role: "Support", id: "brigitte" }, { name: "Illari", role: "Support", id: "illari" },
         { name: "Juno", role: "Support", id: "juno" }, { name: "Kiriko", role: "Support", id: "kiriko" },
         { name: "Lifeweaver", role: "Support", id: "lifeweaver" }, { name: "Lúcio", role: "Support", id: "lucio" },
         { name: "Mercy", role: "Support", id: "mercy" }, { name: "Moira", role: "Support", id: "moira" },
-        { name: "Zenyatta", role: "Support", id: "zenyatta" }, { name: "Jetpack Cat", role: "Support", id: "jetpack-cat" },
-        { name: "Mizuki", role: "Support", id: "mizuki" }
+        { name: "Zenyatta", role: "Support", id: "zenyatta" }
     ];
 
     let currentFilter = 'All';
@@ -196,14 +185,18 @@
         const filtered = currentFilter === 'All' ? heroes : heroes.filter(h => h.role === currentFilter);
         const hero = filtered[Math.floor(Math.random() * filtered.length)];
         
-        // Update Text
-        document.getElementById('hero-name').innerText = hero.name;
-        document.getElementById('hero-role').innerText = hero.role.toUpperCase();
-
-        // Update Image (Using the official Blizzard CDN pattern)
         const img = document.getElementById('hero-img');
         const placeholder = document.getElementById('placeholder');
         
+        document.getElementById('hero-name').innerText = hero.name;
+        document.getElementById('hero-role').innerText = hero.role.toUpperCase();
+
+        // Clear previous image and show loading
+        img.style.display = 'none';
+        placeholder.style.display = 'block';
+        placeholder.innerText = "...";
+
+        // Update image source
         img.src = `https://d15f34w2p8l1cc.cloudfront.net/overwatch/static/hero/${hero.id}/icon-portrait.png`;
         
         img.onload = () => {
